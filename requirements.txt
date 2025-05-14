@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+pyautogui
+pygetwindow
+mss
+pillow
+psutil
+requests
+pywebview
+pyinstaller 

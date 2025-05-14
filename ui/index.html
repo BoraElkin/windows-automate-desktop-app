@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Server Monitor</title>
+  <style>
+    body { font-family: sans-serif; background: #222; color: #eee; }
+    .status { font-size: 1.5em; margin-bottom: 1em; }
+    .log { background: #111; padding: 1em; border-radius: 8px; max-height: 300px; overflow-y: auto; }
+    .ok { color: #0f0; }
+    .fail { color: #f00; }
+  </style>
+</head>
+<body>
+  <div class="status" id="status">Checking server...</div>
+  <div class="log" id="log"></div>
+  <script>
+    async function checkHealth() {
+      try {
+        const res = await fetch('http://127.0.0.1:8000/api/v1/health');
+        const data = await res.json();
+        console.log('Health response:', data);
+        if (res.ok && data.status === 'ok') {
+          document.getElementById('status').textContent = 'Server is UP';
+          document.getElementById('status').className = 'status ok';
+        } else {
+          throw new Error();
+        }
+      } catch (e) {
+        document.getElementById('status').textContent = 'Server is DOWN';
+        document.getElementById('status').className = 'status fail';
+        console.log('Health check failed:', e);
+      }
+    }
+    async function loadLog() {
+      try {
+        const res = await fetch('http://127.0.0.1:8000/api/v1/requests_log');
+        const data = await res.json();
+        console.log('Log response:', data);
+        if (data.log && data.log.length > 0) {
+          document.getElementById('log').innerHTML = data.log.map(line => `<div>${line}</div>`).join('');
+        } else {
+          document.getElementById('log').textContent = 'No log entries found.';
+        }
+      } catch (e) {
+        document.getElementById('log').textContent = 'Could not load log.';
+        console.log('Log load failed:', e);
+      }
+    }
+    setInterval(checkHealth, 5000);
+    setInterval(loadLog, 3000);
+    checkHealth();
+    loadLog();
+  </script>
+</body>
+</html>

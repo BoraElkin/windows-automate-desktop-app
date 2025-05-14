@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Logs
+*.log
+app.log
+requests.log
+dtop_automation.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+dist/
+build/
+*.spec
+
+# PyInstaller
+*.exe
+*.dll
+*.pkg
+*.app
+
+# Editor files
+.vscode/
+.idea/
+*.swp 
