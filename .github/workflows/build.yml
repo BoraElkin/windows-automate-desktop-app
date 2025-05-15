@@ -27,6 +27,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        pip install pyinstaller
         
     - name: Build app
       run: |
@@ -35,6 +36,13 @@ jobs:
                     --onedir \
                     --add-data "$(pwd)/src:src" \
                     --add-data "$(pwd)/ui:ui" \
+                    --hidden-import=uvicorn \
+                    --hidden-import=fastapi \
+                    --hidden-import=starlette \
+                    --hidden-import=pydantic \
+                    --hidden-import=requests \
+                    --hidden-import=webview \
+                    --hidden-import=pyautogui \
                     src/ui.py
                     
     - name: Create release directory

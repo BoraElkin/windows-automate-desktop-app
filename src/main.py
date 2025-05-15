@@ -80,6 +80,10 @@ class AutomateRequest(BaseModel):
     window_id: str
     actions: List[AutomateAction]
 
+@app.get("/")
+def root():
+    return {"message": "API is running. See /docs for documentation."}
+
 @app.get("/api/v1/health")
 def health():
     uptime = int(time.time() - start_time)
@@ -107,16 +111,21 @@ def automate(req: AutomateRequest):
             prev_app = get_frontmost_app()
         elif platform.system() == "Windows":
             prev_win = get_frontmost_window_windows()
+        print(f"Activating window {req.window_id}")
         activate_window(req.window_id)
-        time.sleep(0.5)
+        print("Window activated. Waiting 1 second...")
+        time.sleep(1)
         for action in req.actions:
+            print(f"Moving to ({action.x}, {action.y}) and clicking")
             pyautogui.moveTo(action.x, action.y)
             pyautogui.click()
             if action.text:
+                print(f"Typing: {action.text}")
                 pyautogui.typewrite(action.text)
             # Log the action
             with open("dtop_automation.log", "a") as logf:
                 logf.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} window_id={req.window_id} x={action.x} y={action.y} text={action.text}\n")
+            print(f"Action complete: ({action.x}, {action.y}), text='{action.text}'")
         # Restore previous app (macOS) or window (Windows)
         if prev_app and platform.system() == "Darwin":
             owner = w.get('kCGWindowOwnerName') if isinstance(w, dict) else None
@@ -128,8 +137,10 @@ def automate(req: AutomateRequest):
                 prev_win.activate()
             except Exception as e:
                 print(f"Error restoring previous window on Windows: {e}")
+        print("Automation complete.")
         return {"status": "ok"}
     except Exception as e:
+        print(f"Automation failed: {e}")
         raise HTTPException(status_code=500, detail=f"Automation failed: {e}")
 
 @app.get("/api/v1/logs")

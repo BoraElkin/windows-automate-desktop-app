@@ -40,12 +40,12 @@ else
 fi
 
 # Install dependencies if not already installed
-if ! pip show fastapi > /dev/null 2>&1; then
+if ! python3 -m pip show fastapi > /dev/null 2>&1; then
     echo "Installing dependencies..."
-    pip install -r requirements.txt || error "Failed to install dependencies"
+    python3 -m pip install -r requirements.txt || error "Failed to install dependencies"
     success "Dependencies installed successfully"
 fi
 
 # Launch the app
 echo "Starting the app..."
-python src/ui.py || error "Failed to start the app" 
+python3 src/ui.py || error "Failed to start the app" 

@@ -1,254 +1,148 @@
-# Screenshot-Automate Desktop App
+# FastAPI Desktop Automation App
 
-A FastAPI-based backend for desktop window automation and screenshotting, designed for integration with a web frontend and AI-driven workflows.
-
----
-
-## Quick Start
-
-### Option 1: Download Latest Release (Recommended for Users)
-
-1. Go to the [Releases](https://github.com/yourusername/dtop-app/releases) page
-2. Download the latest `DTopApp-macOS.zip`
-3. Extract the zip file
-4. Double-click `DTopApp.app` to run
-
-**Note:** The app is automatically built and released when we push a new version tag.
-
-### Option 2: Run from Source (For Developers)
-
-```sh
-./run.sh
-```
-
----
+A cross-platform desktop automation tool with a FastAPI backend. Automate window actions, screenshots, and text input via API.
 
 ## Features
+- List open windows
+- Screenshot any window
+- Automate mouse and keyboard actions
+- View logs of actions and requests
 
-- **Health check endpoint**
-- **List open user-facing windows** (filtered for relevance)
-- **Take screenshots of any open window**
-- **Automate mouse clicks and typing in any window**
-- **(Planned) Retrieve automation logs**
+## Requirements
+- Python 3.8 or higher
+- (macOS only) Accessibility permissions for your terminal or Python (for automation)
 
----
+## Setup
 
-## API Endpoints
-
-### 1. `GET /api/v1/health`
-**Description:**  
-Returns the health status and uptime of the server.
-
-**Response:**
-```json
-{
-  "status": "ok",
-  "uptime_seconds": 123
-}
-```
-
-**Test with curl:**
 ```sh
-curl http://127.0.0.1:8000/api/v1/health
+git clone <your-repo-url>
+cd <your-repo-directory>
+python3 -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+python3 -m pip install --upgrade pip
+python3 -m pip install -r requirements.txt
+bash run.sh
 ```
 
----
+## Usage
 
-### 2. `GET /api/v1/windows`
-**Description:**  
-Lists all open, user-facing windows with their IDs, titles, and bounds.
+See interactive API docs at http://localhost:8000/docs
 
-**Response:**
-```json
-[
-  {
-    "id": "394",
-    "title": "Notes Test",
-    "bounds": { "x": 100, "y": 100, "width": 800, "height": 600 }
-  },
-  ...
-]
-```
+## API Endpoints & Example Usage
 
-**Test with curl:**
+### 1. Root Endpoint
+**GET /**
 ```sh
-curl http://127.0.0.1:8000/api/v1/windows
+curl http://localhost:8000/
 ```
 
 ---
 
-### 3. `GET /api/v1/windows/{window_id}/screenshot`
-**Description:**  
-Returns a PNG screenshot of the specified window's client area.
-
-**Response:**  
-- `image/png` binary data
-
-**Test with curl:**
+### 2. Health Check
+**GET /api/v1/health**
 ```sh
-curl http://127.0.0.1:8000/api/v1/windows/<window_id>/screenshot --output screenshot.png
+curl http://localhost:8000/api/v1/health
 ```
 
 ---
 
-### 4. `POST /api/v1/automate`
-**Description:**  
-Automates actions (mouse clicks and typing) in a specified window.
-
-**Request Body:**
-```json
-{
-  "window_id": "394",
-  "actions": [
-    { "x": 600, "y": 200, "text": "Hello World" }
-  ]
-}
-```
-- Brings the window to the front.
-- For each action: moves mouse, clicks, and types text if provided.
-
-**Response:**
-```json
-{ "status": "ok" }
-```
-
-**Test with curl:**
+### 3. List Windows
+**GET /api/v1/windows**
 ```sh
-curl -X POST http://127.0.0.1:8000/api/v1/automate \
+curl http://localhost:8000/api/v1/windows
+```
+
+---
+
+### 4. Screenshot a Window  
+Replace `<window_id>` with the actual window ID.
+```sh
+curl http://localhost:8000/api/v1/windows/<window_id>/screenshot --output screenshot.png
+```
+
+---
+
+### 5. Automate Actions on a Window  
+Replace `<window_id>` with the actual window ID.
+```sh
+curl -X POST http://localhost:8000/api/v1/automate \
   -H "Content-Type: application/json" \
-  -d '{"window_id": "<window_id>", "actions": [{"x": 100, "y": 100, "text": "Hello"}]}'
+  -d '{
+    "window_id": "<window_id>",
+    "actions": [
+      {"x": 100, "y": 200, "text": "hello"}
+    ]
+  }'
 ```
 
 ---
 
-### 5. `GET /api/v1/logs?limit=N`
-**Description:**  
-Returns the last N log entries from the automation log.
-
-**Test with curl:**
+### 6. Get App Logs (last 50 entries)
 ```sh
-curl http://127.0.0.1:8000/api/v1/logs
+curl http://localhost:8000/api/v1/logs?limit=50
 ```
 
 ---
 
-### 6. `GET /api/v1/requests_log`
-**Description:**  
-Returns the last N entries from the requests log.
-
-**Test with curl:**
+### 7. Get Requests Log (last 20 entries)
 ```sh
-curl http://127.0.0.1:8000/api/v1/requests_log
+curl http://localhost:8000/api/v1/requests_log?limit=20
 ```
 
 ---
 
-## Setup & Requirements
-
-- **Python 3.8+**
-- **macOS or Windows** (cross-platform support)
-- **Dependencies:**  
-  - `fastapi`
-  - `uvicorn`
-  - `pygetwindow`
-  - `pyautogui`
-  - `mss`
-  - `pydantic`
-  - `pywebview`
-
-Install dependencies:
-```sh
-pip install -r requirements.txt
-```
-
----
-
-## Running the Server and UI
-
-```sh
-python src/ui.py
-```
-
-- This will start the FastAPI backend and open a native desktop window to the web UI.
-- The backend runs at `http://127.0.0.1:8000`.
-- The UI is served at `http://127.0.0.1:8000/ui/index.html` (not file://).
-- The UI and API must be served from the same origin for full functionality.
-
----
-
-## Project Structure
-
-```
-/dtop-app
-  /src
-    main.py         # FastAPI backend
-    ui.py           # PyWebview launcher
-    ...
-  /ui               # Frontend HTML/JS for the UI
-  requirements.txt
-  README.md
-  run.sh
-```
-
----
+### 8. API Documentation (Swagger UI)
+Open in your browser:  
+http://localhost:8000/docs
 
 ## Notes
-
-- **macOS:**  
-  - Grant Accessibility permissions to your terminal or Python app for automation to work.
-  - Some system UI windows are filtered out for a cleaner window list.
-- **Window IDs:**  
-  - IDs may change if you close/reopen windows. Always fetch the latest list before automating.
-- **Automation:**  
-  - Coordinates are absolute screen positions. Use screenshots to determine the correct values.
-- **Bundled App:**  
-  - The app is now bundled with PyInstaller and works correctly in both development and bundled modes.
-
----
+- On macOS, grant Accessibility permissions to your terminal or Python for automation to work:
+  - System Settings → Privacy & Security → Accessibility
+- Logs are stored in the `logs/` directory.
+- For development, see and edit `src/main.py` for API logic.
 
 ## Contributing
-
-- Keep code simple and DRY.
-- Avoid code duplication and unnecessary mocking.
-- Keep files under 200–300 lines; refactor as needed.
-- Do not add stubbing or fake data to dev/prod code.
-
----
+Pull requests welcome! Please open an issue first to discuss major changes.
 
 ## License
+[MIT](LICENSE)
 
-MIT 
+## Building a Standalone App (PyInstaller)
 
-## Building the App
+You can build a standalone macOS app bundle using PyInstaller:
 
-### For Users
-Simply download the latest release from the [Releases](https://github.com/BoraElkin/ss-desktop-app/releases) page.
+### Local Build
 
-### For Developers
-If you want to build the app yourself:
+```sh
+bash build.sh
+```
+- The app bundle will be in `release/DTopApp.app`
+- A zip file for distribution will be in `release/DTopApp-macOS.zip`
 
-1. Clone the repository:
-   ```sh
-   git clone https://github.com/yourusername/dtop-app.git
-   cd dtop-app
-   ```
+### Manual PyInstaller Command
 
-2. Run the build script:
-   ```sh
-   ./build.sh
-   ```
+```sh
+python3 -m pip install pyinstaller
+pyinstaller --name DTopApp \
+            --windowed \
+            --onedir \
+            --add-data "src:src" \
+            --add-data "ui:ui" \
+            src/ui.py
+```
 
-3. The bundled app will be in the `release` directory:
-   - `release/DTopApp.app` - The macOS application bundle
-   - `release/DTopApp-macOS.zip` - A zip file containing the app
+## GitHub Actions: Automated Build & Release
 
-### Creating a New Release
-To create a new release:
+This project includes a GitHub Actions workflow that automatically builds and uploads a macOS app bundle as a release artifact whenever you push a tag starting with `v` (e.g., `v1.0.0`).
 
-1. Update the version in your code
-2. Create and push a new tag:
-   ```sh
-   git tag v1.0.0  # Use appropriate version number
-   git push origin v1.0.0
-   ```
-3. GitHub Actions will automatically build and create a new release 
+- The workflow is defined in `.github/workflows/build.yml`.
+- The release artifact will be available as `DTopApp-macOS.zip` in the GitHub release.
+
+## Notes for Releases
+- Make sure all changes are committed and pushed before tagging a release.
+- Tag a new release with:
+  ```sh
+  git tag v1.0.0
+  git push origin v1.0.0
+  ```
+- The GitHub Actions workflow will build and upload the release automatically. 

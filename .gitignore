@@ -1,8 +1,9 @@
-# Python
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
+*$py.class
+
+# C extensions
 *.so
 
 # Virtual environments
@@ -10,20 +11,31 @@ __pycache__/
 venv/
 ENV/
 
+# Distribution / packaging
+.Python
+dist/
+build/
+egg-info/
+
 # Logs
+logs/
 *.log
-app.log
-requests.log
-dtop_automation.log
 
 # OS files
 .DS_Store
 Thumbs.db
 
-# Build artifacts
-dist/
-build/
-*.spec
+# IDEs
+.vscode/
+.idea/
+
+# Test output
+htmlcov/
+.coverage
+.tox/
+
+# Misc
+*.swp
 
 # PyInstaller
 *.exe
@@ -32,6 +44,4 @@ build/
 *.app
 
 # Editor files
-.vscode/
-.idea/
 *.swp 
