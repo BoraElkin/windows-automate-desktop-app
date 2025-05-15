@@ -44,4 +44,9 @@ htmlcov/
 *.app
 
 # Editor files
-*.swp 
+*.swp
+
+# Release artifacts
+release/
+*.zip
+*.app 
