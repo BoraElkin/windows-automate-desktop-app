@@ -145,4 +145,19 @@ This project includes a GitHub Actions workflow that automatically builds and up
   git tag v1.0.0
   git push origin v1.0.0
   ```
-- The GitHub Actions workflow will build and upload the release automatically. 
+- The GitHub Actions workflow will build and upload the release automatically.
+
+## Running the macOS App (Unsigned/Unnotarized)
+
+If you download the macOS app from GitHub Releases, macOS will mark it as quarantined and unsigned. To run the app, follow these steps:
+
+1. **Download** the latest `DTopApp.zip` from the [GitHub Releases](https://github.com/your-repo/releases).
+2. **Unzip** the file (double-click in Finder).
+3. **Remove the quarantine attribute** by running this command in Terminal:
+   ```sh
+   xattr -dr com.apple.quarantine /path/to/DTopApp.app
+   ```
+   Replace `/path/to/DTopApp.app` with the actual path to the app (e.g., `~/Downloads/DTopApp.app`).
+4. **Double-click** the app to launch it.
+
+**Note:** This step is required because unsigned apps downloaded from the internet are blocked by default on macOS. Removing the quarantine attribute allows the app to run normally. 
