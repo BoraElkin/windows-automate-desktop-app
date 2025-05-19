@@ -39,9 +39,9 @@ jobs:
 
     - name: Create release directory
       run: |
-        if not exist release mkdir release
-        xcopy /E /I /Y dist\DTopApp release\DTopApp
-        powershell Compress-Archive -Path release\DTopApp\* -DestinationPath release\DTopApp-Windows.zip
+        if (!(Test-Path -Path release)) { New-Item -ItemType Directory -Path release }
+        Copy-Item -Path dist\DTopApp -Destination release\DTopApp -Recurse -Force
+        Compress-Archive -Path release\DTopApp\* -DestinationPath release\DTopApp-Windows.zip -Force
 
     - name: Create Release
       uses: softprops/action-gh-release@v1
