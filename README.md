@@ -1,6 +1,6 @@
-# FastAPI Desktop Automation App
+# FastAPI Desktop Automation App (Windows)
 
-A cross-platform desktop automation tool with a FastAPI backend. Automate window actions, screenshots, and text input via API.
+A Windows desktop automation tool with a FastAPI backend. Automate window actions, screenshots, and text input via API.
 
 ## Features
 - List open windows
@@ -9,18 +9,19 @@ A cross-platform desktop automation tool with a FastAPI backend. Automate window
 - View logs of actions and requests
 
 ## Requirements
+- Windows 10 or higher
 - Python 3.8 or higher
-- (macOS only) Accessibility permissions for your terminal or Python (for automation)
+- Accessibility permissions may be required for automation (run as administrator if needed)
 
 ## Setup
 
 ```sh
 git clone <your-repo-url>
 cd <your-repo-directory>
-python3 -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-python3 -m pip install --upgrade pip
-python3 -m pip install -r requirements.txt
+python -m venv .venv
+.venv\Scripts\activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
 bash run.sh
 ```
 
@@ -96,8 +97,7 @@ Open in your browser:
 http://localhost:8000/docs
 
 ## Notes
-- On macOS, grant Accessibility permissions to your terminal or Python for automation to work:
-  - System Settings → Privacy & Security → Accessibility
+- This app is **Windows-only**. macOS is not supported.
 - Logs are stored in the `logs/` directory.
 - For development, see and edit `src/main.py` for API logic.
 
@@ -109,34 +109,34 @@ Pull requests welcome! Please open an issue first to discuss major changes.
 
 ## Building a Standalone App (PyInstaller)
 
-You can build a standalone macOS app bundle using PyInstaller:
+You can build a standalone Windows app bundle using PyInstaller:
 
 ### Local Build
 
 ```sh
 bash build.sh
 ```
-- The app bundle will be in `release/DTopApp.app`
-- A zip file for distribution will be in `release/DTopApp-macOS.zip`
+- The app bundle will be in `release/DTopApp.exe` or similar
+- A zip file for distribution will be in `release/DTopApp-Windows.zip`
 
 ### Manual PyInstaller Command
 
 ```sh
-python3 -m pip install pyinstaller
+python -m pip install pyinstaller
 pyinstaller --name DTopApp \
             --windowed \
             --onedir \
-            --add-data "src:src" \
-            --add-data "ui:ui" \
+            --add-data "src;src" \
+            --add-data "ui;ui" \
             src/ui.py
 ```
 
 ## GitHub Actions: Automated Build & Release
 
-This project includes a GitHub Actions workflow that automatically builds and uploads a macOS app bundle as a release artifact whenever you push a tag starting with `v` (e.g., `v1.0.0`).
+This project includes a GitHub Actions workflow that automatically builds and uploads a Windows app bundle as a release artifact whenever you push a tag starting with `v` (e.g., `v1.0.0`).
 
 - The workflow is defined in `.github/workflows/build.yml`.
-- The release artifact will be available as `DTopApp-macOS.zip` in the GitHub release.
+- The release artifact will be available as `DTopApp-Windows.zip` in the GitHub release.
 
 ## Notes for Releases
 - Make sure all changes are committed and pushed before tagging a release.
@@ -147,17 +147,12 @@ This project includes a GitHub Actions workflow that automatically builds and up
   ```
 - The GitHub Actions workflow will build and upload the release automatically.
 
-## Running the macOS App (Unsigned/Unnotarized)
+## Running the Windows App (Unsigned)
 
-If you download the macOS app from GitHub Releases, macOS will mark it as quarantined and unsigned. To run the app, follow these steps:
+If you download the Windows app from GitHub Releases, Windows may warn you about running unsigned executables. To run the app:
 
 1. **Download** the latest `DTopApp.zip` from the [GitHub Releases](https://github.com/your-repo/releases).
-2. **Unzip** the file (double-click in Finder).
-3. **Remove the quarantine attribute** by running this command in Terminal:
-   ```sh
-   xattr -dr com.apple.quarantine /path/to/DTopApp.app
-   ```
-   Replace `/path/to/DTopApp.app` with the actual path to the app (e.g., `~/Downloads/DTopApp.app`).
-4. **Double-click** the app to launch it.
+2. **Unzip** the file.
+3. **Run** `DTopApp.exe` (you may need to allow it through Windows Defender SmartScreen).
 
-**Note:** This step is required because unsigned apps downloaded from the internet are blocked by default on macOS. Removing the quarantine attribute allows the app to run normally. 
+**Note:** This step is required because unsigned apps downloaded from the internet are blocked by default on Windows. Allow the app to run if you trust the source. 

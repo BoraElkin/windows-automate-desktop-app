@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import time
 from typing import List, Dict
-from .screenshotter import list_windows, screenshot_window, activate_window, get_frontmost_app, get_frontmost_window_windows, get_window_by_id
+from .screenshotter import list_windows, screenshot_window, activate_window, get_frontmost_window_windows, get_window_by_id
 import pyautogui
 import os
 import json
@@ -103,14 +103,10 @@ def get_window_screenshot(window_id: str):
 
 @app.post("/api/v1/automate")
 def automate(req: AutomateRequest):
-    prev_app = None
     prev_win = None
     w = get_window_by_id(req.window_id)
     try:
-        if platform.system() == "Darwin":
-            prev_app = get_frontmost_app()
-        elif platform.system() == "Windows":
-            prev_win = get_frontmost_window_windows()
+        prev_win = get_frontmost_window_windows()
         print(f"Activating window {req.window_id}")
         activate_window(req.window_id)
         print("Window activated. Waiting 1 second...")
@@ -126,13 +122,8 @@ def automate(req: AutomateRequest):
             with open("dtop_automation.log", "a") as logf:
                 logf.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} window_id={req.window_id} x={action.x} y={action.y} text={action.text}\n")
             print(f"Action complete: ({action.x}, {action.y}), text='{action.text}'")
-        # Restore previous app (macOS) or window (Windows)
-        if prev_app and platform.system() == "Darwin":
-            owner = w.get('kCGWindowOwnerName') if isinstance(w, dict) else None
-            if prev_app != owner:
-                script = f'tell application "{prev_app}" to activate'
-                subprocess.run(['osascript', '-e', script])
-        elif prev_win and platform.system() == "Windows":
+        # Restore previous window
+        if prev_win:
             try:
                 prev_win.activate()
             except Exception as e:

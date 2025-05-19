@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: windows-latest
     
     steps:
     - uses: actions/checkout@v3
@@ -19,44 +19,40 @@ jobs:
 
     - name: List files before build
       run: |
-        ls -l
-        ls -l ui
-        ls -l src
+        dir
+        dir ui
+        dir src
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install pyinstaller
-        
+        pip install pywin32
+        pip install wheel
+        pip install setuptools
+        pip install pillow
+
     - name: Build app
       run: |
         pyinstaller --name DTopApp \
                     --windowed \
                     --onedir \
-                    --add-data "$(pwd)/src:src" \
-                    --add-data "$(pwd)/ui:ui" \
-                    --hidden-import=uvicorn \
-                    --hidden-import=fastapi \
-                    --hidden-import=starlette \
-                    --hidden-import=pydantic \
-                    --hidden-import=requests \
-                    --hidden-import=webview \
-                    --hidden-import=pyautogui \
+                    --add-data "src;src" \
+                    --add-data "ui;ui" \
                     src/ui.py
-                    
+
     - name: Create release directory
       run: |
-        mkdir -p release
-        cp -r "dist/DTopApp.app" release/
-        cd release
-        zip -r "DTopApp-macOS.zip" "DTopApp.app"
-        
+        if not exist release mkdir release
+        xcopy /E /I /Y dist\DTopApp release\DTopApp
+        powershell Compress-Archive -Path release\DTopApp\* -DestinationPath release\DTopApp-Windows.zip
+
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          release/DTopApp-macOS.zip
+          release/DTopApp-Windows.zip
         generate_release_notes: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
