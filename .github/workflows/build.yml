@@ -35,12 +35,7 @@ jobs:
 
     - name: Build app
       run: |
-        pyinstaller --name DTopApp \
-                    --windowed \
-                    --onedir \
-                    --add-data "src;src" \
-                    --add-data "ui;ui" \
-                    src/ui.py
+        pyinstaller --name DTopApp --windowed --onedir --add-data "src;src" --add-data "ui;ui" src/ui.py
 
     - name: Create release directory
       run: |
@@ -55,4 +50,4 @@ jobs:
           release/DTopApp-Windows.zip
         generate_release_notes: true
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+        GITHUB_TOKEN: ${{ secrets.GH_PAT }} 
