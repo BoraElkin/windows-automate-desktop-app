@@ -20,7 +20,7 @@ if getattr(sys, 'frozen', False):
     # Running as a PyInstaller bundle
     BUNDLE_DIR = sys._MEIPASS
     SRC_PATH = os.path.join(BUNDLE_DIR, 'src')
-    PYTHON_EXECUTABLE = '/usr/bin/python3'
+    PYTHON_EXECUTABLE = sys.executable  # Use the bundled Python
     CWD = BUNDLE_DIR
 else:
     # Running in dev mode
@@ -37,6 +37,7 @@ env['PYTHONPATH'] = os.path.dirname(SRC_PATH) + os.pathsep + env.get('PYTHONPATH
 ui_html_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../ui/index.html'))
 
 print("Launching FastAPI server...")
+server = None
 try:
     # Start FastAPI server as a subprocess
     server = subprocess.Popen([
@@ -52,7 +53,11 @@ except Exception as e:
     print("Exception occurred:", e)
 finally:
     print("Shutting down server...")
-    # When the window is closed, terminate the server
-    server.terminate()
-    server.wait()
+    # When the window is closed, terminate the server if it was started
+    if server is not None:
+        try:
+            server.terminate()
+            server.wait(timeout=5)
+        except Exception as e:
+            print("Error shutting down server:", e)
     print("Server shut down.") 
